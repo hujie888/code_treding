@@ -222,12 +222,12 @@ def fetch_mcp_new_servers() -> list[dict]:
         headers["Authorization"] = f"Bearer {token}"
 
     queries = [
-        # 有积累且近期活跃的 MCP Server（上限 5000 过滤刷星异常仓库）
-        (f"topic:mcp-server stars:200..5000 pushed:>{since_14d}", 6),
-        # 更广义的 MCP 生态（model-context-protocol 话题）
-        (f"topic:model-context-protocol stars:300..5000 pushed:>{since_14d}", 4),
-        # 最新冒出的 MCP Server（新项目，低星无碍）
-        (f"topic:mcp-server created:>{since_7d}", 4),
+        # 有积累且近期活跃的 MCP Server（≥500星，上限5000过滤刷星）
+        (f"topic:mcp-server stars:500..5000 pushed:>{since_14d}", 6),
+        # 更广义的 MCP 生态（model-context-protocol 话题，≥500星）
+        (f"topic:model-context-protocol stars:500..5000 pushed:>{since_14d}", 4),
+        # 新建但已获得关注的 MCP Server（7天内创建且≥100星才算有价值）
+        (f"topic:mcp-server created:>{since_7d} stars:>100", 4),
     ]
 
     seen, all_repos = set(), []
@@ -326,20 +326,19 @@ def summarize_with_kimi(raw_data: dict) -> str:
 
 ## 三个板块
 
-**🔥 今日 GitHub 热榜**
+**🔥 今日 GitHub 热榜**（严格输出 5 条）
 来源：GitHub Trending + OSSInsight，按今日涨星数降序。
-处理：今日涨星为 0 或缺失的项目直接跳过；只保留涨星最多的 3-5 条。
+处理：今日涨星为 0 或缺失的项目直接跳过；从剩余中取涨星最多的前 5 条，不足 5 条则取全部。
 格式：`- **项目名** 今日 +N⭐ · [GitHub](url) · 一句话亮点`
 
-**🤖 AI Agent & MCP 新动态**
-来源：stars 较高或近期活跃的 MCP Server、AI Agent 框架，以及重要 Release。
-处理：按总星数从高到低排列，选最值得关注的 4-6 条（stars 为 0 的跳过）。
+**🤖 AI Agent & MCP 新动态**（严格输出 5 条）
+来源：stars ≥ 500 的 MCP Server / model-context-protocol 生态仓库，以及重要 Release。
+处理：按总星数从高到低排列，输出前 5 条；stars < 100 的项目一律跳过不展示；不要出现任何低知名度仓库。
 格式：`- **项目名** ⭐ N(总) · [GitHub](url) · 一句话说清楚它解决什么问题`
-若该项目是近 7 天新建，在行末附注 `🆕 新项目`。
 
-**📰 HN 热议**
+**📰 HN 热议**（严格输出 5 条）
 来源：Hacker News 当日 AI 相关热帖。
-处理：选评论数最多的 3-5 条。
+处理：按评论数降序选前 5 条；不足 5 条则取全部。
 格式：`- **标题（中文翻译）** · [原文](url) · N 条讨论 · 一句话说争议点或亮点`
 
 ## 原始数据
