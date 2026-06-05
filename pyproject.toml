@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "ai-digest-lark"
+version = "0.1.0"
+description = "AI 技术日报自动抓取并推送到飞书"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "httpx>=0.24.0",
+    "python-dotenv>=1.0.0",
+]
+
+[project.scripts]
+ai-digest = "ai_digest_lark:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["ai_digest_lark*"]
