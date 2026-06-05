@@ -355,6 +355,8 @@ def summarize_with_kimi(raw_data: dict) -> str:
         json={
             "model":    "moonshot-v1-32k",
             "messages": [{"role": "user", "content": prompt}],
+            "stream":   False,
+            "max_tokens": 8192,
         },
         timeout=60,
     )
